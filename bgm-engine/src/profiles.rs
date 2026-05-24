@@ -98,9 +98,10 @@ impl LoadProfile for StepsLoad {
 /// Build the [`LoadProfile`] strategy described by a [`LoadSpec`].
 pub fn profile_from(spec: &LoadSpec) -> Box<dyn LoadProfile> {
     match spec.profile {
-        Profile::Constant => {
-            Box::new(ConstantLoad { concurrency: spec.concurrency, duration: spec.duration })
-        }
+        Profile::Constant => Box::new(ConstantLoad {
+            concurrency: spec.concurrency,
+            duration: spec.duration,
+        }),
         Profile::RampUp => Box::new(RampUpLoad {
             target: spec.concurrency,
             ramp: spec.ramp.unwrap_or(Duration::ZERO),
@@ -121,14 +122,22 @@ mod tests {
 
     #[test]
     fn constant_is_flat() {
-        let p = ConstantLoad { concurrency: 8, duration: None };
+        let p = ConstantLoad {
+            concurrency: 8,
+            duration: None,
+        };
         assert_eq!(p.concurrency_at(Duration::ZERO), 8);
         assert_eq!(p.concurrency_at(Duration::from_secs(99)), 8);
     }
 
     #[test]
     fn steps_climb_in_stairs() {
-        let p = StepsLoad { target: 10, steps: 5, ramp: Duration::from_secs(10), duration: None };
+        let p = StepsLoad {
+            target: 10,
+            steps: 5,
+            ramp: Duration::from_secs(10),
+            duration: None,
+        };
         assert_eq!(p.concurrency_at(Duration::ZERO), 2); // stair 1 of 5 → 10/5
         assert_eq!(p.concurrency_at(Duration::from_secs(4)), 6); // stair 3 → 6
         assert_eq!(p.concurrency_at(Duration::from_secs(10)), 10); // top
@@ -137,7 +146,11 @@ mod tests {
 
     #[test]
     fn ramp_grows_then_holds() {
-        let p = RampUpLoad { target: 10, ramp: Duration::from_secs(10), duration: None };
+        let p = RampUpLoad {
+            target: 10,
+            ramp: Duration::from_secs(10),
+            duration: None,
+        };
         assert_eq!(p.concurrency_at(Duration::ZERO), 1); // never 0 once started
         assert_eq!(p.concurrency_at(Duration::from_secs(5)), 5);
         assert_eq!(p.concurrency_at(Duration::from_secs(10)), 10);

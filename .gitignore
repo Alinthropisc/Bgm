@@ -16,6 +16,8 @@ Cargo.lock
 *.swp
 *~
 
+Gemini_Generated_Image_y2bxw9y2bxw9y2bx.png
+
 # Project-local environment loaded by scripts/bgm.sh (keep secrets out of git)
 .bgm.env
 

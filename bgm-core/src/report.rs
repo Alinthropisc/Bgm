@@ -21,7 +21,11 @@ pub struct IterInfo {
 impl IterInfo {
     /// Create context for a worker's first iteration.
     pub fn new(worker_id: usize) -> Self {
-        Self { worker_id, worker_seq: 0, runner_seq: 0 }
+        Self {
+            worker_id,
+            worker_seq: 0,
+            runner_seq: 0,
+        }
     }
 }
 

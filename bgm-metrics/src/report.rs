@@ -16,8 +16,9 @@ use crate::aggregate::Aggregate;
 
 /// Fixed bucket upper-bounds (ms) for the latency distribution. Roughly
 /// log-spaced to cover sub-millisecond to multi-second responses.
-const DIST_EDGES_MS: [f64; 11] =
-    [1.0, 2.0, 5.0, 10.0, 20.0, 50.0, 100.0, 200.0, 500.0, 1_000.0, 2_000.0];
+const DIST_EDGES_MS: [f64; 11] = [
+    1.0, 2.0, 5.0, 10.0, 20.0, 50.0, 100.0, 200.0, 500.0, 1_000.0, 2_000.0,
+];
 
 /// One bar of the latency distribution: how many samples fell at or below
 /// `le_ms`, but above the previous edge. `le_ms == None` is the overflow bucket
@@ -81,13 +82,18 @@ impl BenchReport {
         // Guard the divide so a zero-duration snapshot reports 0, not infinity.
         let per_sec = |n: u64| if secs > 0.0 { n as f64 / secs } else { 0.0 };
 
-        let edges_nanos: Vec<u64> =
-            DIST_EDGES_MS.iter().map(|ms| (ms * 1_000_000.0) as u64).collect();
+        let edges_nanos: Vec<u64> = DIST_EDGES_MS
+            .iter()
+            .map(|ms| (ms * 1_000_000.0) as u64)
+            .collect();
         let counts = h.bucket_counts(&edges_nanos);
         let distribution = counts
             .iter()
             .enumerate()
-            .map(|(i, &count)| Bucket { le_ms: DIST_EDGES_MS.get(i).copied(), count })
+            .map(|(i, &count)| Bucket {
+                le_ms: DIST_EDGES_MS.get(i).copied(),
+                count,
+            })
             .collect();
 
         Self {
@@ -139,7 +145,11 @@ impl fmt::Display for BenchReport {
             self.throughput_bps / 1_048_576.0
         )?;
         writeln!(f, "Latency (ms)")?;
-        writeln!(f, "  min {:.2}  mean {:.2}  max {:.2}", self.latency.min_ms, self.latency.mean_ms, self.latency.max_ms)?;
+        writeln!(
+            f,
+            "  min {:.2}  mean {:.2}  max {:.2}",
+            self.latency.min_ms, self.latency.mean_ms, self.latency.max_ms
+        )?;
         writeln!(
             f,
             "  p50 {:.2}  p90 {:.2}  p95 {:.2}  p99 {:.2}",

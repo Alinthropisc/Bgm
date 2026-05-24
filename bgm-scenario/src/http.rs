@@ -20,7 +20,10 @@ pub struct Header {
 impl Header {
     /// Construct a header from any string-like pair.
     pub fn new(name: impl Into<String>, value: impl Into<String>) -> Self {
-        Self { name: name.into(), value: value.into() }
+        Self {
+            name: name.into(),
+            value: value.into(),
+        }
     }
 }
 
@@ -52,7 +55,10 @@ impl Default for HttpRequestSpec {
 impl HttpRequestSpec {
     /// A bare `GET url` request.
     pub fn get(url: impl Into<String>) -> Self {
-        Self { url: url.into(), ..Self::default() }
+        Self {
+            url: url.into(),
+            ..Self::default()
+        }
     }
 }
 

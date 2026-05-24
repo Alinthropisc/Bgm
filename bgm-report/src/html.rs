@@ -50,7 +50,12 @@ impl Reporter for HtmlReporter {
         // Summary cards.
         h.push_str("<div class=\"cards\">");
         card(&mut h, "RPS", &format!("{:.0}", report.rps), "");
-        card(&mut h, "Throughput", &format!("{:.2} MiB/s", report.throughput_bps / 1_048_576.0), "alt");
+        card(
+            &mut h,
+            "Throughput",
+            &format!("{:.2} MiB/s", report.throughput_bps / 1_048_576.0),
+            "alt",
+        );
         card(&mut h, "p50 latency", &format!("{:.1} ms", l.p50_ms), "alt");
         card(&mut h, "p99 latency", &format!("{:.1} ms", l.p99_ms), "alt");
         card(

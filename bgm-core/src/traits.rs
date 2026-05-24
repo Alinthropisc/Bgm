@@ -32,11 +32,7 @@ pub trait Protocol: Send + Sync + 'static {
     ///
     /// Returning `Err(IterError)` records a failed iteration; it does **not**
     /// abort the benchmark.
-    async fn execute(
-        &self,
-        worker: &mut Self::Worker,
-        info: &IterInfo,
-    ) -> IterResult<IterReport>;
+    async fn execute(&self, worker: &mut Self::Worker, info: &IterInfo) -> IterResult<IterReport>;
 
     /// Release per-worker resources. Default: nothing to do.
     async fn teardown(&self, _worker: Self::Worker) -> Result<()> {

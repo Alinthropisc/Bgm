@@ -100,7 +100,9 @@ impl Scenario {
             }
         }
         if self.load.concurrency == 0 {
-            return Err(ScenarioError::Invalid("load.concurrency must be >= 1".into()));
+            return Err(ScenarioError::Invalid(
+                "load.concurrency must be >= 1".into(),
+            ));
         }
         Ok(())
     }
@@ -139,7 +141,12 @@ pub struct ScenarioBuilder {
 impl ScenarioBuilder {
     /// Start a builder with the given run name.
     pub fn new(name: impl Into<String>) -> Self {
-        Self { scenario: Scenario { name: name.into(), ..Scenario::default() } }
+        Self {
+            scenario: Scenario {
+                name: name.into(),
+                ..Scenario::default()
+            },
+        }
     }
 
     /// Set a `GET` request to `url`.

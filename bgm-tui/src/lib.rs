@@ -70,7 +70,10 @@ pub async fn run(
     ratatui::restore();
 
     let elapsed = result?;
-    let report = shared.lock().expect("aggregate mutex poisoned").snapshot(elapsed);
+    let report = shared
+        .lock()
+        .expect("aggregate mutex poisoned")
+        .snapshot(elapsed);
     Ok(report)
 }
 
@@ -107,7 +110,10 @@ async fn dashboard_loop(
         }
 
         let elapsed = start.elapsed();
-        let report = shared.lock().expect("aggregate mutex poisoned").snapshot(elapsed);
+        let report = shared
+            .lock()
+            .expect("aggregate mutex poisoned")
+            .snapshot(elapsed);
 
         let delta = report.total.saturating_sub(last_total);
         last_total = report.total;

@@ -216,13 +216,20 @@ async fn main() -> Result<()> {
             };
             let protocol = HttpProtocol::from_scenario_with(&scenario, config)
                 .context("configuring HTTP protocol")?;
-            EngineBuilder::new(protocol, &scenario.load).build().run(cancel.clone())
+            EngineBuilder::new(protocol, &scenario.load)
+                .build()
+                .run(cancel.clone())
         }
         ProtocolKind::Ws => {
-            let config = WsConfig { timeout: cli.timeout, expect_reply: !cli.no_reply };
+            let config = WsConfig {
+                timeout: cli.timeout,
+                expect_reply: !cli.no_reply,
+            };
             let protocol = WsProtocol::from_scenario_with(&scenario, config)
                 .context("configuring WebSocket protocol")?;
-            EngineBuilder::new(protocol, &scenario.load).build().run(cancel.clone())
+            EngineBuilder::new(protocol, &scenario.load)
+                .build()
+                .run(cancel.clone())
         }
     };
     let report = if cli.use_tui() {
@@ -231,7 +238,9 @@ async fn main() -> Result<()> {
             target_iterations: scenario.load.iterations,
             target_duration: scenario.load.duration,
         };
-        bgm_tui::run(meta, reports, cancel).await.context("dashboard")?
+        bgm_tui::run(meta, reports, cancel)
+            .await
+            .context("dashboard")?
     } else {
         collect_silently(reports).await
     };
@@ -261,8 +270,8 @@ fn emit_report(cli: &Cli, report: &BenchReport) -> Result<()> {
     }
 
     if let Some(path) = &cli.baseline {
-        let base =
-            bgm_report::load(path).with_context(|| format!("loading baseline {}", path.display()))?;
+        let base = bgm_report::load(path)
+            .with_context(|| format!("loading baseline {}", path.display()))?;
         let comparison = Comparison::new(report, &base);
         eprintln!("{comparison}");
         if comparison.regressed {

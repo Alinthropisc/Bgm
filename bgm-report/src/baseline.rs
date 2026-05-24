@@ -54,7 +54,13 @@ impl Comparison {
             || p99_delta_pct > P99_RISE_PCT
             || error_rate_delta_pp > ERROR_RISE_PP;
 
-        Self { rps_delta_pct, p50_delta_pct, p99_delta_pct, error_rate_delta_pp, regressed }
+        Self {
+            rps_delta_pct,
+            p50_delta_pct,
+            p99_delta_pct,
+            error_rate_delta_pp,
+            regressed,
+        }
     }
 }
 

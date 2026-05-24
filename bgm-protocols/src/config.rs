@@ -16,6 +16,9 @@ pub struct HttpClientConfig {
 
 impl Default for HttpClientConfig {
     fn default() -> Self {
-        Self { timeout: Duration::from_secs(30), follow_redirects: false }
+        Self {
+            timeout: Duration::from_secs(30),
+            follow_redirects: false,
+        }
     }
 }

@@ -88,6 +88,9 @@ extract:
         assert_eq!(step.asserts.status, Some(200));
         assert_eq!(step.extract.len(), 2);
         assert_eq!(step.extract[0].from, ExtractFrom::Json("/token".into()));
-        assert_eq!(step.extract[1].from, ExtractFrom::Header("X-Request-Id".into()));
+        assert_eq!(
+            step.extract[1].from,
+            ExtractFrom::Header("X-Request-Id".into())
+        );
     }
 }

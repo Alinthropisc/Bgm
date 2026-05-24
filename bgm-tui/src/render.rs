@@ -44,7 +44,9 @@ fn panel(title: &str) -> Block<'_> {
         .border_style(Style::default().fg(theme::MUTED))
         .title(Span::styled(
             format!(" {title} "),
-            Style::default().fg(theme::MUTED).add_modifier(Modifier::BOLD),
+            Style::default()
+                .fg(theme::MUTED)
+                .add_modifier(Modifier::BOLD),
         ))
 }
 
@@ -56,8 +58,11 @@ fn draw_header(frame: &mut Frame, area: Rect, snap: &Snapshot) {
     let [left, gauge] =
         Layout::horizontal([Constraint::Min(20), Constraint::Length(34)]).areas(inner);
 
-    let (status_text, status_color) =
-        if snap.finished { ("[ DONE ]", theme::OK) } else { ("[ACTIVE]", theme::ACCENT) };
+    let (status_text, status_color) = if snap.finished {
+        ("[ DONE ]", theme::OK)
+    } else {
+        ("[ACTIVE]", theme::ACCENT)
+    };
 
     let line = Line::from(vec![
         Span::styled(
@@ -67,11 +72,22 @@ fn draw_header(frame: &mut Frame, area: Rect, snap: &Snapshot) {
                 .bg(theme::ACCENT)
                 .add_modifier(Modifier::BOLD),
         ),
-        Span::styled(format!("  {}", snap.meta.name), Style::default().fg(theme::MUTED)),
+        Span::styled(
+            format!("  {}", snap.meta.name),
+            Style::default().fg(theme::MUTED),
+        ),
         Span::raw("   STATUS: "),
-        Span::styled(status_text, Style::default().fg(status_color).add_modifier(Modifier::BOLD)),
+        Span::styled(
+            status_text,
+            Style::default()
+                .fg(status_color)
+                .add_modifier(Modifier::BOLD),
+        ),
         Span::raw("   DURATION: "),
-        Span::styled(fmt_clock(snap.elapsed), Style::default().fg(theme::ACCENT_ALT)),
+        Span::styled(
+            fmt_clock(snap.elapsed),
+            Style::default().fg(theme::ACCENT_ALT),
+        ),
     ]);
     frame.render_widget(Paragraph::new(line), left);
 
@@ -81,7 +97,12 @@ fn draw_header(frame: &mut Frame, area: Rect, snap: &Snapshot) {
 fn draw_progress(frame: &mut Frame, area: Rect, snap: &Snapshot) {
     let label = match (snap.meta.target_iterations, snap.progress()) {
         (Some(target), Some(p)) => {
-            format!("{:.0}% ({}/{})", p * 100.0, fmt_count(snap.report.total), fmt_count(target))
+            format!(
+                "{:.0}% ({}/{})",
+                p * 100.0,
+                fmt_count(snap.report.total),
+                fmt_count(target)
+            )
         }
         (None, Some(p)) => format!("{:.0}%", p * 100.0),
         _ => "● running".to_owned(),
@@ -90,7 +111,10 @@ fn draw_progress(frame: &mut Frame, area: Rect, snap: &Snapshot) {
     let gauge = Gauge::default()
         .gauge_style(Style::default().fg(theme::ACCENT))
         .ratio(ratio)
-        .label(Span::styled(label, Style::default().add_modifier(Modifier::BOLD)));
+        .label(Span::styled(
+            label,
+            Style::default().add_modifier(Modifier::BOLD),
+        ));
     frame.render_widget(gauge, area);
 }
 
@@ -99,8 +123,7 @@ fn draw_metrics(frame: &mut Frame, area: Rect, snap: &Snapshot) {
     let inner = block.inner(area);
     frame.render_widget(block, area);
 
-    let [stats, spark] =
-        Layout::vertical([Constraint::Length(5), Constraint::Min(1)]).areas(inner);
+    let [stats, spark] = Layout::vertical([Constraint::Length(5), Constraint::Min(1)]).areas(inner);
 
     let r = snap.report;
     let live_rps = snap.rps_history.last().copied().unwrap_or(0);
@@ -112,7 +135,9 @@ fn draw_metrics(frame: &mut Frame, area: Rect, snap: &Snapshot) {
             label("RPS (Req/s)   "),
             Span::styled(
                 fmt_count(live_rps),
-                Style::default().fg(theme::ACCENT).add_modifier(Modifier::BOLD),
+                Style::default()
+                    .fg(theme::ACCENT)
+                    .add_modifier(Modifier::BOLD),
             ),
             Span::styled(
                 format!("   peak {}", fmt_count(snap.peak_rps)),
@@ -134,9 +159,15 @@ fn draw_metrics(frame: &mut Frame, area: Rect, snap: &Snapshot) {
         ]),
         Line::from(vec![
             label("OUTCOMES      "),
-            Span::styled(format!("ok {}", fmt_count(r.success)), Style::default().fg(theme::OK)),
+            Span::styled(
+                format!("ok {}", fmt_count(r.success)),
+                Style::default().fg(theme::OK),
+            ),
             Span::raw(" · "),
-            Span::styled(format!("4xx {}", r.client_error), Style::default().fg(theme::WARN)),
+            Span::styled(
+                format!("4xx {}", r.client_error),
+                Style::default().fg(theme::WARN),
+            ),
             Span::raw(" · "),
             Span::styled(
                 format!("5xx {} err {}", r.server_error, r.error),
@@ -154,8 +185,10 @@ fn draw_sparkline(frame: &mut Frame, area: Rect, snap: &Snapshot) {
     let width = area.width as usize;
     let hist = snap.rps_history;
     let start = hist.len().saturating_sub(width);
-    let bars: Vec<Bar> =
-        hist[start..].iter().map(|&v| Bar::default().value(v).text_value(String::new())).collect();
+    let bars: Vec<Bar> = hist[start..]
+        .iter()
+        .map(|&v| Bar::default().value(v).text_value(String::new()))
+        .collect();
 
     let chart = BarChart::default()
         .data(BarGroup::default().bars(&bars))
@@ -177,13 +210,16 @@ fn draw_latency(frame: &mut Frame, area: Rect, snap: &Snapshot) {
     let inner = block.inner(area);
     frame.render_widget(block, area);
 
-    let [summary, row] =
-        Layout::vertical([Constraint::Length(1), Constraint::Min(1)]).areas(inner);
+    let [summary, row] = Layout::vertical([Constraint::Length(1), Constraint::Min(1)]).areas(inner);
 
     let l = &snap.report.latency;
     let has_data = snap.report.total > 0;
     let cell = |name: &'static str, v: f64| {
-        let text = if has_data { format!("{v:.1}") } else { "--".to_owned() };
+        let text = if has_data {
+            format!("{v:.1}")
+        } else {
+            "--".to_owned()
+        };
         vec![
             Span::styled(format!("{name} "), Style::default().fg(theme::MUTED)),
             Span::styled(text, Style::default().fg(theme::ACCENT_ALT)),
@@ -228,7 +264,11 @@ fn draw_latency(frame: &mut Frame, area: Rect, snap: &Snapshot) {
 
     // Percentile column.
     let pline = |name: &'static str, v: f64| {
-        let text = if has_data { format!("{v:.1}") } else { "--".to_owned() };
+        let text = if has_data {
+            format!("{v:.1}")
+        } else {
+            "--".to_owned()
+        };
         Line::from(vec![
             Span::styled(format!("{name:<4}"), Style::default().fg(theme::MUTED)),
             Span::styled(text, Style::default().fg(theme::ACCENT_ALT)),

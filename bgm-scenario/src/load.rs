@@ -65,7 +65,11 @@ impl Default for LoadSpec {
 impl LoadSpec {
     /// A run that holds `concurrency` workers for `duration`.
     pub fn constant(concurrency: usize, duration: Duration) -> Self {
-        Self { concurrency, duration: Some(duration), ..Self::default() }
+        Self {
+            concurrency,
+            duration: Some(duration),
+            ..Self::default()
+        }
     }
 
     /// `true` if neither a duration nor an iteration budget bounds the run.

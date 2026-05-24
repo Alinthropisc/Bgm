@@ -34,7 +34,10 @@ pub struct WsConfig {
 
 impl Default for WsConfig {
     fn default() -> Self {
-        Self { timeout: Duration::from_secs(30), expect_reply: true }
+        Self {
+            timeout: Duration::from_secs(30),
+            expect_reply: true,
+        }
     }
 }
 
@@ -88,19 +91,23 @@ impl Protocol for WsProtocol {
     type Worker = WsStream;
 
     async fn setup(&self, _worker_id: usize) -> Result<Self::Worker> {
-        self.connect().await.map_err(|e| BgmError::Setup(format!("websocket connect: {e}")))
+        self.connect()
+            .await
+            .map_err(|e| BgmError::Setup(format!("websocket connect: {e}")))
     }
 
-    async fn execute(
-        &self,
-        worker: &mut Self::Worker,
-        info: &IterInfo,
-    ) -> IterResult<IterReport> {
+    async fn execute(&self, worker: &mut Self::Worker, info: &IterInfo) -> IterResult<IterReport> {
         let spec = self.template.render(info);
         let message = spec.body.as_deref().unwrap_or("").to_owned();
 
         let started = Instant::now();
-        let outcome = round_trip(worker, message, self.config.expect_reply, self.config.timeout).await;
+        let outcome = round_trip(
+            worker,
+            message,
+            self.config.expect_reply,
+            self.config.timeout,
+        )
+        .await;
 
         let reply = match outcome {
             Ok(reply) => reply,
@@ -115,7 +122,9 @@ impl Protocol for WsProtocol {
         let duration = started.elapsed();
 
         if !self.asserts.is_empty() {
-            self.asserts.check_body_latency(duration, &reply).map_err(IterError::Assertion)?;
+            self.asserts
+                .check_body_latency(duration, &reply)
+                .map_err(IterError::Assertion)?;
         }
 
         Ok(IterReport {

@@ -73,7 +73,11 @@ impl HttpProtocol {
                 reqwest::Url::parse(&spec.url)
                     .map_err(|e| BgmError::Config(format!("invalid url {:?}: {e}", spec.url)))?;
             }
-            steps.push(StepPlan { spec, asserts: step.asserts, extract: step.extract });
+            steps.push(StepPlan {
+                spec,
+                asserts: step.asserts,
+                extract: step.extract,
+            });
         }
         Ok(Self { steps, config })
     }
@@ -96,11 +100,7 @@ impl Protocol for HttpProtocol {
             .map_err(|e| BgmError::Setup(format!("http client: {e}")))
     }
 
-    async fn execute(
-        &self,
-        client: &mut Self::Worker,
-        info: &IterInfo,
-    ) -> IterResult<IterReport> {
+    async fn execute(&self, client: &mut Self::Worker, info: &IterInfo) -> IterResult<IterReport> {
         // Per-iteration variable context: dynamic counters first, then whatever
         // each step extracts gets layered on top for subsequent steps.
         let mut ctx = MapContext::new();
@@ -128,7 +128,9 @@ impl Protocol for HttpProtocol {
             let elapsed = started.elapsed();
 
             if !plan.asserts.is_empty() {
-                plan.asserts.check(code, elapsed, &body).map_err(IterError::Assertion)?;
+                plan.asserts
+                    .check(code, elapsed, &body)
+                    .map_err(IterError::Assertion)?;
             }
             for extract in &plan.extract {
                 let value = extract_value(extract, &headers, &body)?;
@@ -157,7 +159,10 @@ fn extract_value(extract: &Extract, headers: &HeaderMap, body: &[u8]) -> IterRes
             .and_then(|v| v.to_str().ok())
             .map(ToOwned::to_owned)
             .ok_or_else(|| {
-                IterError::Assertion(format!("extract {:?}: header {name:?} missing", extract.var))
+                IterError::Assertion(format!(
+                    "extract {:?}: header {name:?} missing",
+                    extract.var
+                ))
             }),
         ExtractFrom::Json(pointer) => {
             let value: Value = serde_json::from_slice(body).map_err(|e| {

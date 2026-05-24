@@ -22,7 +22,10 @@ impl RequestTemplate {
     /// Bake in static vars and detect remaining dynamic placeholders.
     pub fn new(resolved: HttpRequestSpec) -> Self {
         let dynamic = spec_has_placeholder(&resolved);
-        Self { spec: resolved, dynamic }
+        Self {
+            spec: resolved,
+            dynamic,
+        }
     }
 
     /// `true` when the template still contains `{{ … }}` to expand per iteration.
@@ -47,7 +50,10 @@ pub(crate) fn spec_has_placeholder(spec: &HttpRequestSpec) -> bool {
     in_str(&spec.method)
         || in_str(&spec.url)
         || spec.body.as_deref().is_some_and(in_str)
-        || spec.headers.iter().any(|h| in_str(&h.name) || in_str(&h.value))
+        || spec
+            .headers
+            .iter()
+            .any(|h| in_str(&h.name) || in_str(&h.value))
 }
 
 /// [`Lookup`] exposing per-iteration counters as template variables.
@@ -74,7 +80,11 @@ mod tests {
     fn static_template_is_borrowed_and_unchanged() {
         let t = RequestTemplate::new(HttpRequestSpec::get("https://x/health"));
         assert!(!t.is_dynamic());
-        let info = IterInfo { worker_id: 3, worker_seq: 1, runner_seq: 7 };
+        let info = IterInfo {
+            worker_id: 3,
+            worker_seq: 1,
+            runner_seq: 7,
+        };
         assert!(matches!(t.render(&info), std::borrow::Cow::Borrowed(_)));
     }
 
@@ -83,7 +93,11 @@ mod tests {
         let spec = HttpRequestSpec::get("https://x/item/{{ seq }}?w={{ worker_id }}");
         let t = RequestTemplate::new(spec);
         assert!(t.is_dynamic());
-        let info = IterInfo { worker_id: 3, worker_seq: 1, runner_seq: 7 };
+        let info = IterInfo {
+            worker_id: 3,
+            worker_seq: 1,
+            runner_seq: 7,
+        };
         assert_eq!(t.render(&info).url, "https://x/item/7?w=3");
     }
 }

@@ -34,22 +34,34 @@ pub struct Status {
 impl Status {
     /// A successful outcome carrying a protocol code (use `0` if none).
     pub fn success(code: i64) -> Self {
-        Self { kind: StatusKind::Success, code }
+        Self {
+            kind: StatusKind::Success,
+            code,
+        }
     }
 
     /// A client-side error outcome.
     pub fn client_error(code: i64) -> Self {
-        Self { kind: StatusKind::ClientError, code }
+        Self {
+            kind: StatusKind::ClientError,
+            code,
+        }
     }
 
     /// A server-side error outcome.
     pub fn server_error(code: i64) -> Self {
-        Self { kind: StatusKind::ServerError, code }
+        Self {
+            kind: StatusKind::ServerError,
+            code,
+        }
     }
 
     /// A transport/other error outcome (code is informational, often `0`).
     pub fn error(code: i64) -> Self {
-        Self { kind: StatusKind::Error, code }
+        Self {
+            kind: StatusKind::Error,
+            code,
+        }
     }
 
     /// Build a [`Status`] from an HTTP status code using standard ranges.

@@ -76,12 +76,18 @@ mod tests {
             max_latency: Some(Duration::from_secs(1)),
             body_contains: Some("ok".into()),
         };
-        assert!(a.check(200, Duration::from_millis(10), b"all ok here").is_ok());
+        assert!(
+            a.check(200, Duration::from_millis(10), b"all ok here")
+                .is_ok()
+        );
     }
 
     #[test]
     fn reports_first_failure() {
-        let a = Assertions { status: Some(200), ..Default::default() };
+        let a = Assertions {
+            status: Some(200),
+            ..Default::default()
+        };
         let err = a.check(503, Duration::ZERO, b"").unwrap_err();
         assert!(err.contains("503"));
     }

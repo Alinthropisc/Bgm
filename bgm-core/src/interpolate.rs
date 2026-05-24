@@ -53,7 +53,9 @@ macro_rules! impl_interpolate_identity {
     };
 }
 
-impl_interpolate_identity!(bool, u8, u16, u32, u64, usize, i8, i16, i32, i64, isize, f32, f64);
+impl_interpolate_identity!(
+    bool, u8, u16, u32, u64, usize, i8, i16, i32, i64, isize, f32, f64
+);
 
 /// Replace every `{{ key }}` in `input`. Whitespace inside the braces is
 /// trimmed, so `{{ id }}` and `{{id}}` are equivalent. A `{{` without a
@@ -134,7 +136,10 @@ mod tests {
     fn replaces_known_keys_and_keeps_unknown() {
         let ctx = MapContext::new().with("id", "42");
         assert_eq!(interpolate_str("/users/{{ id }}", &ctx), "/users/42");
-        assert_eq!(interpolate_str("/x/{{ id }}/{{ q }}", &ctx), "/x/42/{{ q }}");
+        assert_eq!(
+            interpolate_str("/x/{{ id }}/{{ q }}", &ctx),
+            "/x/42/{{ q }}"
+        );
     }
 
     #[test]
