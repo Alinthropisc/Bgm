@@ -1,0 +1,29 @@
+# Build artifacts
+/target
+**/target
+Cargo.lock
+
+# Reference projects (ideas only, not part of BGM)
+/old_projects
+
+# Local progress journal (machine-local, survives editor crashes)
+/updates
+
+# Editor / tooling
+/.claude
+/.idea
+/.vscode
+*.swp
+*~
+
+# Project-local environment loaded by scripts/bgm.sh (keep secrets out of git)
+.bgm.env
+
+# Generated report artifacts
+/report.json
+/bgm-report.html
+*.bgm.json
+
+# OS junk
+.DS_Store
+Thumbs.db

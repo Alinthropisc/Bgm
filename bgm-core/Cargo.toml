@@ -1,0 +1,15 @@
+[package]
+name = "bgm-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "BGM domain core: traits, types and errors (no runtime deps)"
+
+[lints]
+workspace = true
+
+[dependencies]
+serde.workspace = true
+thiserror.workspace = true
+async-trait.workspace = true

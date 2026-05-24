@@ -1,0 +1,35 @@
+# BGM scenario — a small smoke test.
+# Run with:  ./scripts/bgm.sh --file examples/smoke.yml
+#
+# Every text field supports {{ var }} substitution. Static vars are defined
+# below; dynamic ones (provided by the engine per iteration) include
+# {{ seq }}, {{ worker_id }} and {{ worker_seq }}.
+
+name: api-smoke
+
+vars:
+  host: httpbin.org
+  token: demo-token
+
+load:
+  concurrency: 20      # target concurrent workers
+  profile: ramp_up     # constant | ramp_up
+  ramp: 5s             # time to climb from 1 → concurrency
+  duration: 30s        # stop after this long
+  rate: 500            # optional global cap, requests/second
+
+request:
+  method: GET
+  url: "https://{{ host }}/anything/{{ seq }}"
+  headers:
+    - name: Authorization
+      value: "Bearer {{ token }}"
+    - name: Accept
+      value: application/json
+  # body: '{"hello": "world"}'
+
+# Optional response checks — a failed assertion counts the iteration as failed.
+assert:
+  status: 200
+  max_latency: 2s
+  # body_contains: "httpbin"

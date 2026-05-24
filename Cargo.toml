@@ -1,0 +1,123 @@
+# The repo root is both the workspace root AND the `bgm` binary package
+# (its entry point is src/main.rs — the CLI / composition root / Facade).
+[package]
+name = "bgm"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description.workspace = true
+
+[[bin]]
+name = "bgm"
+path = "src/main.rs"
+
+[lints]
+workspace = true
+
+[dependencies]
+bgm-core.workspace = true
+bgm-metrics.workspace = true
+bgm-report.workspace = true
+bgm-scenario.workspace = true
+bgm-protocols.workspace = true
+bgm-engine.workspace = true
+bgm-tui.workspace = true
+clap = { workspace = true }
+tokio = { workspace = true }
+tokio-util = { workspace = true }
+anyhow = { workspace = true }
+humantime = { workspace = true }
+
+[workspace]
+resolver = "2"
+# All existing crates; the root `bgm` package is an implicit member too.
+members = [
+    "bgm-macros",
+    "bgm-core",
+    "bgm-metrics",
+    "bgm-report",
+    "bgm-scenario",
+    "bgm-protocols",
+    "bgm-engine",
+    "bgm-tui",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+authors = ["Ali"]
+description = "BGM — a powerful async load-testing tool with a real-time TUI"
+repository = ""
+
+[workspace.dependencies]
+# --- internal crates ---
+bgm-core = { path = "bgm-core", version = "0.1.0" }
+bgm-metrics = { path = "bgm-metrics", version = "0.1.0" }
+bgm-report = { path = "bgm-report", version = "0.1.0" }
+bgm-scenario = { path = "bgm-scenario", version = "0.1.0" }
+bgm-protocols = { path = "bgm-protocols", version = "0.1.0" }
+bgm-engine = { path = "bgm-engine", version = "0.1.0" }
+bgm-tui = { path = "bgm-tui", version = "0.1.0" }
+bgm-macros = { path = "bgm-macros", version = "0.1.0" }
+
+# --- async runtime ---
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "signal", "sync"] }
+tokio-util = { version = "0.7", features = ["rt"] }
+async-trait = "0.1"
+
+# --- errors ---
+anyhow = "1"
+thiserror = "1"
+
+# --- (de)serialization ---
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yaml = "0.9"
+humantime = "2"
+humantime-serde = "1"
+
+# --- cli / tui ---
+clap = { version = "4", features = ["derive"] }
+ratatui = "0.29"
+crossterm = "0.28"
+
+# --- http ---
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "http2", "gzip", "stream"] }
+bytes = "1"
+
+# --- websocket ---
+tokio-tungstenite = { version = "0.24", default-features = false, features = ["connect", "rustls-tls-webpki-roots"] }
+futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
+
+# --- stats / rate limiting ---
+hdrhistogram = "7"
+governor = "0.6"
+nonzero_ext = "0.3"
+
+# --- proc-macro deps (used inside bgm-macros) ---
+syn = { version = "2", features = ["full"] }
+quote = "1"
+proc-macro2 = "1"
+
+# Shared lints applied to every crate via `[lints] workspace = true`.
+[workspace.lints.rust]
+unsafe_code = "forbid"
+missing_debug_implementations = "warn"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+# Pragmatic relaxations so pedantic stays useful, not noisy.
+module_name_repetitions = "allow"
+must_use_candidate = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+
+# Thin release profile tuned for a modest machine: optimize but keep
+# compile time and memory reasonable (no fat LTO, single codegen unit off).
+[profile.release]
+opt-level = 2
+lto = "thin"
+codegen-units = 16

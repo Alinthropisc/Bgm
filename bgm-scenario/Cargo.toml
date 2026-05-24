@@ -1,0 +1,18 @@
+[package]
+name = "bgm-scenario"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "BGM scenario model: YAML schema, builder and variable interpolation"
+
+[lints]
+workspace = true
+
+[dependencies]
+bgm-core.workspace = true
+bgm-macros.workspace = true
+serde.workspace = true
+serde_yaml.workspace = true
+humantime-serde.workspace = true
+thiserror.workspace = true

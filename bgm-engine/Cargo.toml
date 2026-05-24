@@ -1,0 +1,17 @@
+[package]
+name = "bgm-engine"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "BGM execution engine: worker pool, load profiles, rate limiting"
+
+[lints]
+workspace = true
+
+[dependencies]
+bgm-core.workspace = true
+bgm-scenario.workspace = true
+tokio.workspace = true
+tokio-util.workspace = true
+governor.workspace = true

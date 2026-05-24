@@ -1,0 +1,15 @@
+[package]
+name = "bgm-report"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "BGM reporters (text/json/csv/html) and baseline run comparison"
+
+[lints]
+workspace = true
+
+[dependencies]
+bgm-metrics.workspace = true
+serde.workspace = true
+serde_json.workspace = true

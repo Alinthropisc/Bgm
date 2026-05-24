@@ -1,0 +1,27 @@
+# BGM scenario — WebSocket message round-trips.
+# Run with:  ./scripts/bgm.sh --file examples/ws.yml
+#
+# Each iteration sends `request.body` as a WebSocket message over a persistent
+# per-worker connection and waits for one reply (the measured latency is the
+# message RTT). Set fire-and-forget with the CLI flag --no-reply.
+
+name: ws-echo
+protocol: ws
+
+vars:
+  endpoint: wss://echo.websocket.org
+
+load:
+  concurrency: 50
+  profile: ramp_up
+  ramp: 3s
+  duration: 20s
+
+request:
+  url: "{{ endpoint }}"
+  body: '{"ping": {{ seq }}}'   # {{ seq }} makes every message unique
+
+# Optional: assert on the reply (status is ignored for WebSocket).
+assert:
+  max_latency: 1s
+  # body_contains: "ping"

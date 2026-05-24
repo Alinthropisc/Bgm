@@ -1,0 +1,18 @@
+[package]
+name = "bgm-tui"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "BGM real-time terminal dashboard (ratatui)"
+
+[lints]
+workspace = true
+
+[dependencies]
+bgm-core.workspace = true
+bgm-metrics.workspace = true
+ratatui.workspace = true
+crossterm.workspace = true
+tokio.workspace = true
+tokio-util.workspace = true

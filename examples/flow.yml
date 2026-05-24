@@ -1,0 +1,33 @@
+# BGM scenario — a multi-step flow with data passing.
+# Run with:  ./scripts/bgm.sh --file examples/flow.yml
+#
+# Each iteration runs the steps in order. Step 1 extracts a value from its JSON
+# response into `id`; step 2 interpolates `{{ id }}` into its URL. The whole
+# flow is reported as one iteration (latency/bytes summed across steps).
+
+name: id-flow
+
+load:
+  concurrency: 10
+  duration: 20s
+
+steps:
+  - name: fetch-id
+    request:
+      method: GET
+      url: https://httpbin.org/uuid
+    assert:
+      status: 200
+    extract:
+      - { var: id, json: /uuid }          # pull "uuid" from the JSON body
+
+  - name: use-id
+    request:
+      method: GET
+      url: "https://httpbin.org/anything/{{ id }}"
+      headers:
+        - name: X-Correlation-Id
+          value: "{{ id }}"
+    assert:
+      status: 200
+      max_latency: 2s
