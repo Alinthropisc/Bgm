@@ -78,7 +78,8 @@ struct Cli {
     body: Option<String>,
 
     /// Template variable `key=value` (repeatable; merged over the scenario).
-    #[arg(short = 'V', long = "var", value_name = "KEY=VALUE")]
+    // No short flag: clap reserves `-V` for --version.
+    #[arg(long = "var", value_name = "KEY=VALUE")]
     var: Vec<String>,
 
     /// Number of concurrent workers.

@@ -5,11 +5,11 @@ REM a project-local .bgm.env at the repo root is loaded only for the spawned
 REM process.
 REM
 REM Usage:
-REM   scripts\bgm.bat <url|flags...>     run a load test (default)
-REM   scripts\bgm.bat run <url|flags...> explicit run
-REM   scripts\bgm.bat example <name>     run examples\<name>.yml
-REM   scripts\bgm.bat examples           list bundled examples
-REM   scripts\bgm.bat build|fmt|clippy|test|check|clean|help
+REM   bgm.bat <url|flags...>     run a load test (default)
+REM   bgm.bat run <url|flags...> explicit run
+REM   bgm.bat example <name>     run examples\<name>.yml
+REM   bgm.bat examples           list bundled examples
+REM   bgm.bat build|fmt|clippy|test|check|clean|help
 REM
 REM Environment:
 REM   BGM_PROFILE  cargo profile: release (default) or debug.
@@ -17,7 +17,12 @@ REM   BGM_PROFILE  cargo profile: release (default) or debug.
 setlocal enableextensions enabledelayedexpansion
 
 set "SCRIPT_DIR=%~dp0"
-for %%I in ("%SCRIPT_DIR%..") do set "ROOT=%%~fI"
+REM Repo root = wherever Cargo.toml lives (this dir, or its parent for scripts\).
+if exist "%SCRIPT_DIR%Cargo.toml" (
+  for %%I in ("%SCRIPT_DIR%.") do set "ROOT=%%~fI"
+) else (
+  for %%I in ("%SCRIPT_DIR%..") do set "ROOT=%%~fI"
+)
 pushd "%ROOT%"
 
 if not defined BGM_PROFILE set "BGM_PROFILE=release"
@@ -92,11 +97,11 @@ goto :eof
 :usage
 echo BGM - run load tests via the project hub.
 echo.
-echo   scripts\bgm.bat ^<url^|flags...^>     run a load test (default)
-echo   scripts\bgm.bat run ^<url^|flags...^> explicit run
-echo   scripts\bgm.bat example ^<name^>     run examples\^<name^>.yml
-echo   scripts\bgm.bat examples           list bundled examples
-echo   scripts\bgm.bat build^|fmt^|clippy^|test^|check^|clean^|help
+echo   bgm.bat ^<url^|flags...^>     run a load test (default)
+echo   bgm.bat run ^<url^|flags...^> explicit run
+echo   bgm.bat example ^<name^>     run examples\^<name^>.yml
+echo   bgm.bat examples           list bundled examples
+echo   bgm.bat build^|fmt^|clippy^|test^|check^|clean^|help
 echo.
 echo Environment: BGM_PROFILE = release ^(default^) ^| debug
 goto :eof

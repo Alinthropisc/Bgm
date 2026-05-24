@@ -5,18 +5,18 @@
 # your interactive shell.
 #
 # Usage:
-#   ./scripts/bgm.sh <url|flags...>        run a load test (default action)
-#   ./scripts/bgm.sh run <url|flags...>    explicit run
-#   ./scripts/bgm.sh example <name>        run examples/<name>.yml
-#   ./scripts/bgm.sh examples              list bundled examples
-#   ./scripts/bgm.sh build                 build the release binary
-#   ./scripts/bgm.sh fmt                   cargo fmt (whole workspace)
-#   ./scripts/bgm.sh clippy                cargo clippy (whole workspace)
-#   ./scripts/bgm.sh test                  cargo test (whole workspace)
-#   ./scripts/bgm.sh check                 fmt --check + clippy + test
-#   ./scripts/bgm.sh env                   show the project-local environment
-#   ./scripts/bgm.sh clean                 cargo clean
-#   ./scripts/bgm.sh help                  this help
+#   ./bgm.sh <url|flags...>        run a load test (default action)
+#   ./bgm.sh run <url|flags...>    explicit run
+#   ./bgm.sh example <name>        run examples/<name>.yml
+#   ./bgm.sh examples              list bundled examples
+#   ./bgm.sh build                 build the release binary
+#   ./bgm.sh fmt                   cargo fmt (whole workspace)
+#   ./bgm.sh clippy                cargo clippy (whole workspace)
+#   ./bgm.sh test                  cargo test (whole workspace)
+#   ./bgm.sh check                 fmt --check + clippy + test
+#   ./bgm.sh env                   show the project-local environment
+#   ./bgm.sh clean                 cargo clean
+#   ./bgm.sh help                  this help
 #
 # Environment:
 #   BGM_PROFILE   cargo profile: release (default) or debug.
@@ -25,7 +25,13 @@
 set -euo pipefail
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-root_dir="$(cd -- "${script_dir}/.." && pwd)"
+# The repo root is wherever the root Cargo.toml lives. Works whether this
+# script sits in the repo root or in a scripts/ subdirectory.
+if [[ -f "${script_dir}/Cargo.toml" ]]; then
+  root_dir="${script_dir}"
+else
+  root_dir="$(cd -- "${script_dir}/.." && pwd)"
+fi
 cd "${root_dir}"
 
 # --- project-local environment (kept out of your interactive shell) ---------
@@ -67,7 +73,7 @@ run_bin() {
   exec "${bin}" "$@"
 }
 
-usage() { sed -n '2,28p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,23p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; }
 
 cmd="${1:-run}"
 case "${cmd}" in

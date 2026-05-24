@@ -17,18 +17,18 @@ ddosify / oha / goose / k6 — its own design, its own code.
 
 ```sh
 # from the repo root (builds on first run)
-./scripts/bgm.sh https://example.com -c 20 -d 30s
+./bgm.sh https://example.com -c 20 -d 30s
 
 # YAML scenario
-./scripts/bgm.sh --file examples/smoke.yml
+./bgm.sh --file examples/smoke.yml
 
 # pipe a JSON report (no dashboard)
-./scripts/bgm.sh https://example.com -n 1000 -o json > report.json
+./bgm.sh https://example.com -n 1000 -o json > report.json
 ```
 
 Key flags: `-c` concurrency, `-d` duration (`30s`/`2m`), `-n` iterations,
 `-r` rate cap (req/s), `--ramp 5s` ramp-up, `-H "K: V"` headers, `-b` body,
-`-V key=value` template vars, `-o text|json`, `--no-tui`, `--no-reply` (WS).
+`--var key=value` template vars, `-o text|json|csv|html`, `--no-tui`, `--no-reply` (WS).
 
 **Protocols:** HTTP and WebSocket (`protocol: ws`, or a `ws://`/`wss://` URL).
 **Assertions:** a `assert:` block checks `status` / `max_latency` / `body_contains`.
@@ -68,11 +68,11 @@ A Cargo workspace of small, single-responsibility crates. Dependencies point
 
 ```sh
 # render formats: text (default), json, csv, html
-./scripts/bgm.sh https://example.com -n 1000 -o html --out-file report.html
+./bgm.sh https://example.com -n 1000 -o html --out-file report.html
 
 # save a baseline, then gate future runs against it (exits non-zero on regress)
-./scripts/bgm.sh https://example.com -n 1000 --save base.bgm.json
-./scripts/bgm.sh https://example.com -n 1000 --baseline base.bgm.json
+./bgm.sh https://example.com -n 1000 --save base.bgm.json
+./bgm.sh https://example.com -n 1000 --baseline base.bgm.json
 ```
 
 ## Command hub (no env pollution)
@@ -82,17 +82,17 @@ project-local `.bgm.env` (copy from `.bgm.env.example`) is loaded only for the
 spawned process.
 
 ```sh
-./scripts/bgm.sh <url|flags...>     # run (default)
-./scripts/bgm.sh example smoke      # run examples/smoke.yml
-./scripts/bgm.sh build|fmt|clippy|test|check|examples|env|clean
+./bgm.sh <url|flags...>     # run (default)
+./bgm.sh example smoke      # run examples/smoke.yml
+./bgm.sh build|fmt|clippy|test|check|examples|env|clean
 ```
 
-Windows: `scripts\bgm.bat` mirrors the same commands.
+Windows: `bgm.bat` mirrors the same commands.
 
 ## Development
 
 ```sh
-./scripts/bgm.sh check    # fmt --check + clippy + test
+./bgm.sh check    # fmt --check + clippy + test
 ```
 
 Edition 2024, `unsafe` forbidden workspace-wide, clippy `pedantic` on. CI
