@@ -5,13 +5,22 @@ a real-time terminal dashboard. It's an idea-level analog of tools like
 ddosify / oha / goose / k6 — its own design, its own code.
 
 ```
-┌ BGM · STATUS [ACTIVE] · DURATION 00:27 ───────────── 35% (92k/260k) ┐
-├ METRICS (REAL-TIME)            │ LATENCY DISTRIBUTION (ms)            │
-│  RPS  104k   peak 110k         │  Min 1.2  Avg 6.5  p50 5.1  Max 64  │
-│  T-PUT 15.8 MiB/s              │  ▁▃▅▇█ p50 p90 p95 p99 max          │
-│  ░▁▂▃▅▇█▇▅▃▂ (rps)             │                                     │
-└ q-quit · c-clear · h-help ──────── Iter: 306k | Bytes: 46 MiB ───────┘
+╭ BGM  api-smoke   STATUS: [ACTIVE]   DURATION: 00:27 ───── BGM ███████░░░░░ 35% (92k/260k) ╮
+│ METRICS (REAL-TIME) ──────────────────┬ LATENCY DISTRIBUTION (ms) ────────────────────── │
+│  RPS (Req/s)   104k   peak 110k        │  Min 1.2  Avg 6.5  p50 5.1  Max 64               │
+│  T-PUT (MiB/s) 15.8                    │   ▃     █                          min   1.2     │
+│  LATENCY (ms)  p50 5  p99 41           │   █  ▅  █  ▇                       mean  6.5     │
+│  OUTCOMES      ok 305k · 4xx 12 · 5xx 1│   █  █  █  █  ▃                    p50   5.1     │
+│ ─ rps ─────────────────────────────── │   █  █  █  █  █  ▂  ▁              p90  18.0     │
+│  ▂▃▅▇█▇▆▅▇█▇▅▃▂▃▅▇█▇▅  (gradient bars) │  ─────────────────────            p95  27.4     │
+│ ─ p50 ms ───────────────────────────── │  25 50 [75] 100 250 1k ∞          p99  41.0     │
+│  ⢀⡠⠔⠊⠉⠉⠢⢄⡀⢀⠤⠒⠊⠉  (braille line)        │   └ p50 bucket highlighted        max  64.0     │
+╰ q-quit · c-clear · h-help ─────────────────────────── Iter 306k  Bytes 46 MiB  RPS 104k ╯
 ```
+
+Rounded TrueColor frames, gradient "equalizer" bars (calm green → hot lime),
+a sub-pixel **Braille** latency curve, and the **median bucket** lit up in teal
+so your eye lands on "typical" at a glance.
 
 ## Quick start
 

@@ -203,7 +203,14 @@ fn draw_metrics(frame: &mut Frame, area: Rect, snap: &Snapshot) {
     // RPS as a gradient "equalizer", latency as a smooth Braille line below it.
     let [rps_area, lat_area] =
         Layout::vertical([Constraint::Percentage(50), Constraint::Percentage(50)]).areas(charts);
-    gradient_sparkline(frame, rps_area, "rps", snap.rps_history, snap.peak_rps, theme::cool);
+    gradient_sparkline(
+        frame,
+        rps_area,
+        "rps",
+        snap.rps_history,
+        snap.peak_rps,
+        theme::cool,
+    );
     braille_line(frame, lat_area, "p50 ms", snap.lat_history, snap.peak_lat);
 }
 
@@ -214,7 +221,10 @@ fn braille_line(frame: &mut Frame, area: Rect, title: &str, samples: &[u64], max
     let block = Block::default()
         .borders(Borders::TOP)
         .border_style(Style::default().fg(theme::MUTED))
-        .title(Span::styled(format!(" {title} "), Style::default().fg(theme::MUTED)));
+        .title(Span::styled(
+            format!(" {title} "),
+            Style::default().fg(theme::MUTED),
+        ));
     let inner = block.inner(area);
     frame.render_widget(block, area);
 
