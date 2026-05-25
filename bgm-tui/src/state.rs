@@ -25,6 +25,9 @@ pub struct Snapshot<'a> {
     /// Recent instantaneous RPS samples, oldest first (for the sparkline).
     pub rps_history: &'a [u64],
     pub peak_rps: u64,
+    /// Recent p50 latency samples in milliseconds (for the latency sparkline).
+    pub lat_history: &'a [u64],
+    pub peak_lat: u64,
     /// `true` once the engine's channel has closed (run finished).
     pub finished: bool,
     pub show_help: bool,

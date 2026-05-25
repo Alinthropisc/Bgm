@@ -35,8 +35,16 @@ pub use crate::state::RunMeta;
 const TICK: Duration = Duration::from_millis(100);
 /// Seconds per tick, for converting iteration deltas into instantaneous RPS.
 const TICK_SECS: f64 = 0.1;
-/// How many RPS samples to retain for the sparkline.
+/// How many samples to retain for each sparkline.
 const HISTORY: usize = 512;
+
+/// Push a sample onto a ring buffer, dropping the oldest once at capacity.
+fn push_capped(history: &mut VecDeque<u64>, value: u64) {
+    if history.len() == HISTORY {
+        history.pop_front();
+    }
+    history.push_back(value);
+}
 
 /// Run the dashboard to completion and return the final report.
 ///
@@ -87,9 +95,11 @@ async fn dashboard_loop(
     cancel: &CancellationToken,
 ) -> io::Result<Duration> {
     let start = Instant::now();
-    let mut history: VecDeque<u64> = VecDeque::with_capacity(HISTORY);
+    let mut rps_hist: VecDeque<u64> = VecDeque::with_capacity(HISTORY);
+    let mut lat_hist: VecDeque<u64> = VecDeque::with_capacity(HISTORY);
     let mut last_total = 0u64;
     let mut peak_rps = 0u64;
+    let mut peak_lat = 0u64;
     let mut show_help = false;
     let mut ticker = interval(TICK);
 
@@ -101,9 +111,11 @@ async fn dashboard_loop(
             Some(Action::Quit) => cancel.cancel(),
             Some(Action::Clear) => {
                 *shared.lock().expect("aggregate mutex poisoned") = Aggregate::new();
-                history.clear();
+                rps_hist.clear();
+                lat_hist.clear();
                 last_total = 0;
                 peak_rps = 0;
+                peak_lat = 0;
             }
             Some(Action::ToggleHelp) => show_help = !show_help,
             None => {}
@@ -123,20 +135,25 @@ async fn dashboard_loop(
             clippy::cast_sign_loss
         )]
         let instant_rps = (delta as f64 / TICK_SECS) as u64;
-        if history.len() == HISTORY {
-            history.pop_front();
-        }
-        history.push_back(instant_rps);
+        push_capped(&mut rps_hist, instant_rps);
         peak_rps = peak_rps.max(instant_rps);
 
+        #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+        let p50 = report.latency.p50_ms.round() as u64;
+        push_capped(&mut lat_hist, p50);
+        peak_lat = peak_lat.max(p50);
+
         let finished = collector.is_finished();
-        let samples: Vec<u64> = history.iter().copied().collect();
+        let rps_samples: Vec<u64> = rps_hist.iter().copied().collect();
+        let lat_samples: Vec<u64> = lat_hist.iter().copied().collect();
         let snap = Snapshot {
             meta,
             report: &report,
             elapsed,
-            rps_history: &samples,
+            rps_history: &rps_samples,
             peak_rps,
+            lat_history: &lat_samples,
+            peak_lat,
             finished,
             show_help,
         };
